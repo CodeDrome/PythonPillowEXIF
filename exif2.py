@@ -1,3 +1,5 @@
+from typing import Dict
+
 import datetime
 from fractions import Fraction
 
@@ -5,7 +7,7 @@ from PIL import Image
 import PIL.ExifTags
 
 
-def generate_exif_dict(filepath):
+def generate_exif_dict(filepath: str) -> Dict:
 
     """
     Generate a dictionary of dictionaries.
@@ -56,14 +58,12 @@ def generate_exif_dict(filepath):
         raise
 
 
-def _derationalize(rational):
+def _create_lookups() -> Dict:
 
-    print(rational)
-
-    return rational[0] / rational[1]
-
-
-def _create_lookups():
+    """.
+    Create a dictionary of mappings for various numerically
+    encoded items of data to their descriptions.
+    """
 
     lookups = {}
 
@@ -104,7 +104,12 @@ def _create_lookups():
     return lookups
 
 
-def _process_exif_dict(exif_dict):
+def _process_exif_dict(exif_dict: Dict) -> Dict:
+
+    """
+    Set the "processed" value for each item of data
+    to a more human readable form.
+    """
 
     date_format = "%Y:%m:%d %H:%M:%S"
 
@@ -119,20 +124,11 @@ def _process_exif_dict(exif_dict):
     exif_dict["DateTimeDigitized"]["processed"] = \
         datetime.datetime.strptime(exif_dict["DateTimeDigitized"]["raw"], date_format)
 
-    exif_dict["FNumber"]["processed"] = \
-        _derationalize(exif_dict["FNumber"]["raw"])
-    exif_dict["FNumber"]["processed"] = \
-        "f{}".format(exif_dict["FNumber"]["processed"])
+    exif_dict["FNumber"]["processed"] = f"f{float(exif_dict["FNumber"]["raw"]):2.1f}"
 
-    exif_dict["MaxApertureValue"]["processed"] = \
-        _derationalize(exif_dict["MaxApertureValue"]["raw"])
-    exif_dict["MaxApertureValue"]["processed"] = \
-        "f{:2.1f}".format(exif_dict["MaxApertureValue"]["processed"])
+    exif_dict["MaxApertureValue"]["processed"] = f"f{float(exif_dict["MaxApertureValue"]["raw"]):2.1f}"
 
-    exif_dict["FocalLength"]["processed"] = \
-        _derationalize(exif_dict["FocalLength"]["raw"])
-    exif_dict["FocalLength"]["processed"] = \
-        "{}mm".format(exif_dict["FocalLength"]["processed"])
+    exif_dict["FocalLength"]["processed"] = f"{exif_dict["FocalLength"]["raw"]}mm"
 
     exif_dict["FocalLengthIn35mmFilm"]["processed"] = \
         "{}mm".format(exif_dict["FocalLengthIn35mmFilm"]["raw"])
@@ -149,20 +145,12 @@ def _process_exif_dict(exif_dict):
     exif_dict["MeteringMode"]["processed"] = \
         lookups["metering_modes"][exif_dict["MeteringMode"]["raw"]]
 
-    exif_dict["XResolution"]["processed"] = \
-        int(_derationalize(exif_dict["XResolution"]["raw"]))
+    exif_dict["XResolution"]["processed"] = f"{int(exif_dict["XResolution"]["raw"]):.0f}px"
 
-    exif_dict["YResolution"]["processed"] = \
-        int(_derationalize(exif_dict["YResolution"]["raw"]))
+    exif_dict["YResolution"]["processed"] = f"{int(exif_dict["YResolution"]["raw"]):.0f}px"
 
-    exif_dict["ExposureTime"]["processed"] = \
-        _derationalize(exif_dict["ExposureTime"]["raw"])
-    exif_dict["ExposureTime"]["processed"] = \
-        str(Fraction(exif_dict["ExposureTime"]["processed"]).limit_denominator(8000))
+    exif_dict["ExposureTime"]["processed"] = f"{Fraction(exif_dict["ExposureTime"]["raw"])}"
 
-    exif_dict["ExposureBiasValue"]["processed"] = \
-        _derationalize(exif_dict["ExposureBiasValue"]["raw"])
-    exif_dict["ExposureBiasValue"]["processed"] = \
-        "{} EV".format(exif_dict["ExposureBiasValue"]["processed"])
+    exif_dict["ExposureBiasValue"]["processed"] = f"{exif_dict["ExposureBiasValue"]["raw"]} EV"
 
     return exif_dict

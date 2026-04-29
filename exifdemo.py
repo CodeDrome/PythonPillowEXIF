@@ -1,4 +1,4 @@
-import exif
+import exif2
 
 
 def main():
@@ -10,9 +10,9 @@ def main():
 
     try:
 
-        filepath = "vaults_theatre.jpg"
+        filepath = "DSC_0502.jpg"
 
-        exif_dict = exif.generate_exif_dict(filepath)
+        exif_dict = exif2.generate_exif_dict(filepath)
 
         print_exif_dict(exif_dict)
 
@@ -23,14 +23,16 @@ def main():
 
 def print_exif_dict(exif_dict):
 
-    for k, v in exif_dict.items():
+    for key, value in exif_dict.items():
 
-        if v["raw"] is not None:
-            print(k)
-            print("-" * len(k))
-            print("    tag:       {}".format(v["tag"]))
-            print("    raw:       {}".format(v["raw"]))
-            print("    processed: {}\n".format(v["processed"]))
+        if value["raw"] is not None:
+            print(key)
+            print("-" * len(key))
+            print(f"    tag:       {value["tag"]}")
+            print(f"    raw:       {value["raw"]}")
+            print(f"    processed: {value["processed"]}\n")
 
 
-main()
+if __name__ == "__main__":
+
+    main()
